@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Review</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f4f0;
+            margin: 0;
+            padding: 0;
+            color: #3e2723;
+            line-height: 1.6;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in;
+            text-align: center;
+        }
+
+        h1 {
+            color: #5d4037;
+            border-bottom: 2px solid #8d6e63;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        /* Button styles */
+        button,
+        .btn {
+            background-color: #d32f2f;
+            border: none;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Link styles */
+        a {
+            color: #795548;
+            text-decoration: none;
+            background-color: #f0ebe5;
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition: background-color 0.3s, color 0.3s;
+            display: inline-block;
+        }
+
+        a:hover {
+            background-color: #8d6e63;
+            color: #ffffff;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            button,
+            .btn {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Delete Review</h1>
+        <p>Are you sure you want to delete the review "{{ review.headline }}"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Yes, Delete</button>
+        </form>
+        <a href="{% url 'feed' %}" class="btn">Cancel</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket and Review</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f4f0;
+            margin: 0;
+            padding: 0;
+            color: #3e2723;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in;
+        }
+
+        h1, h2 {
+            color: #5d4037;
+            border-bottom: 2px solid #8d6e63;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        form {
+            margin-bottom: 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        /* Input styles */
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 16px;
+            background-color: #fdfdfd;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #8d6e63;
+            box-shadow: 0 0 5px rgba(141, 110, 99, 0.5);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Button styles */
+        button,
+        .btn {
+            background-color: #8d6e63;
+            border: none;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: #5d4037;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Link styles */
+        a {
+            display: inline-block;
+            color: #795548;
+            text-align: center;
+            text-decoration: none;
+            background-color: #f0ebe5;
+            padding: 10px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        a:hover {
+            background-color: #8d6e63;
+            color: #ffffff;
+        }
+
+        /* Message styles */
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .messages li {
+            background-color: #f0ebe5;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 5px solid #8d6e63;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            button,
+            .btn {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Create Ticket and Review</h1>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            
+            <h2>Create Ticket</h2>
+            {{ ticket_form.as_p }}
+
+            <h2>Create Review</h2>
+            {{ review_form.as_p }}
+            
+            <button type="submit">Submit</button>
+            <a href="{% url 'feed' %}" class="btn">Back to Feed</a>
+        </form>
+    </div>
+</body>
+
+</html>

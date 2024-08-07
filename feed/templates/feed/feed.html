@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LitRevu - Flux</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f0ec; /* Soft off-white background */
+            margin: 0;
+            padding: 0;
+            color: #3e2723; /* Dark brown text color */
+            line-height: 1.6;
+            font-size: 16px;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: transform 0.5s ease;
+        }
+
+        /* Navigation bar */
+        .navbar {
+            background-color: #6A4F4B; /* Slightly lighter brown background */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 2em;
+            flex-grow: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar:hover h1 {
+            transform: scale(1.05); /* Slight enlargement on hover */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-links a, .nav-links form {
+            text-decoration: none;
+            color: #ffffff;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a.button, .nav-links form button {
+            background-color: #5A4037;
+            border: 1px solid #5A4037;
+            color: white;
+            font-size: 16px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-links a.button:hover, .nav-links form button:hover {
+            background-color: #4A322F; /* Lighter brown */
+            transform: translateY(-3px); /* More pronounced lift on hover */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Main content layout */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            align-items: flex-start;
+            transition: transform 0.5s ease;
+        }
+
+        .tickets, .reviews {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 {
+            color: #5d4037;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #795548;
+            padding-bottom: 8px;
+        }
+
+        /* Ticket and review styles */
+        .ticket, .review {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .ticket:hover, .review:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions a, .actions button {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #795548;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .actions a:hover, .actions button:hover {
+            background-color: #6d4c41;
+            transform: translateY(-2px);
+        }
+
+        /* Specific Delete button styling */
+        .actions .delete-button {
+            background-color: #B44332; /* More distinct red */
+            font-size: 16px;
+        }
+
+        .actions .delete-button:hover {
+            background-color: #A33A2D; /* Darker red for hover */
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .navbar h1 {
+                font-size: 1.6em;
+            }
+
+            .nav-links a.button, .nav-links form button {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>LitRevu</h1>
+        <div class="nav-links">
+            <a href="{% url 'create_ticket' %}" class="button">Create Ticket</a>
+            <a href="{% url 'create_ticket_review' %}" class="button">Create Ticket and Review</a>
+            <a href="{% url 'list_followed_users' %}" class="button">Followed Users</a>
+            <form method="post" action="{% url 'logout' %}" style="display:flex; height: 47px;">
+                {% csrf_token %}
+                <button type="submit" class="button">Disconnect</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Reviews section on the left -->
+            <div class="reviews">
+                <h2>Reviews</h2>
+                {% for review in reviews %}
+                    <div class="review">
+                        <h3>{{ review.headline }}</h3>
+                        <p>{{ review.body }}</p>
+                        <p><strong>Rating:</strong> {{ review.rating }}</p>
+                        <p><strong>Review of ticket:</strong> {{ review.ticket.title }} by {{ review.user.username }}</p>
+                        <div class="actions">
+                            {% if review.user == request.user %}
+                                <a href="{% url 'edit_review' review.id %}" class="button">Edit</a>
+                                <form method="post" action="{% url 'delete_review' review.id %}" style="display: contents;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tickets section on the right -->
+            <div class="tickets">
+                <h2>Tickets</h2>
+                {% for ticket in tickets %}
+                    <div class="ticket">
+                        <h3>{{ ticket.title }}</h3>
+                        <p>{{ ticket.description }}</p>
+                        {% if ticket.image %}
+                            <img src="{{ ticket.image.url }}" alt="{{ ticket.title }}" style="max-width: 100%;">
+                        {% endif %}
+                        <p><strong>Posted by:</strong> {{ ticket.user.username }}</p>
+                        <div class="actions">
+                            <a href="{% url 'create_review_for_ticket' ticket.id %}" class="button">Make Review</a>
+                            {% if ticket.user == request.user %}
+                                <a href="{% url 'edit_ticket' ticket.id %}" class="button">Edit</a>
+                                <form method="post" action="{% url 'delete_ticket' ticket.id %}" style="display: contents;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
