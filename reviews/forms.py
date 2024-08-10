@@ -4,7 +4,15 @@ from .models import Review
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['rating', 'headline', 'body']  # Exclude 'ticket'
+        fields = ['rating', 'headline', 'body']  # Include all necessary fields
+
+    def clean_rating(self):
+        rating = self.cleaned_data.get('rating')
+        if rating is None:
+            raise forms.ValidationError('Rating is required.')
+        if rating < 1 or rating > 5:
+            raise forms.ValidationError('Rating must be between 1 and 5.')
+        return rating
 
 class TicketReviewForm(forms.Form):
     ticket_title = forms.CharField(max_length=128, label='Ticket Title')
