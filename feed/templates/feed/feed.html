@@ -275,39 +275,67 @@
                         {% if not ticket.has_reviewed %}
                             <a href="{% url 'create_review_for_ticket' ticket.id %}" class="button">Make Review</a>
                         {% else %}
-                            <p>You have already reviewed this ticket.</p>
+                            <a href="#" class="button disabled" style="pointer-events: none; opacity: 0.5;">Make Review</a>
                         {% endif %}
                         {% if ticket.user == request.user %}
-                            <a href="{% url 'edit_ticket' ticket.id %}" class="button">Edit</a>
-                            <form method="post" action="{% url 'delete_ticket' ticket.id %}" style="display: contents;">
+                            <a href="{% url 'edit_ticket' ticket.id %}" class="button">Edit Ticket</a>
+                            <form method="post" action="{% url 'delete_ticket' ticket.id %}" style="display: inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="button delete-button">Delete</button>
+                                <button type="submit" class="button delete-button">Delete Ticket</button>
                             </form>
                         {% endif %}
                     </div>
     
-                    <!-- Reviews related to the ticket (pre-ordered by created_at descending in the view) -->
-                    {% for review in ticket.ordered_reviews %}
+                    <!-- Display the user's review if it exists -->
+                    {% if ticket.user_review %}
                         <div class="review">
-                            <h3>{{ review.headline }}</h3>
-                            <p>{{ review.body }}</p>
-                            <p><strong>Rating:</strong> {{ review.rating }}</p>
-                            <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
+                            <h3>{{ ticket.user_review.headline }}</h3>
+                            <p>{{ ticket.user_review.body }}</p>
+                            <p><strong>Rating:</strong>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= ticket.user_review.rating %}
+                                        <span class="star">&#9733;</span> <!-- Filled star -->
+                                    {% else %}
+                                        <span class="star empty">&#9734;</span> <!-- Empty star -->
+                                    {% endif %}
+                                {% endfor %}
+                            </p>                            
+                            <p><strong>Reviewed by:</strong> {{ ticket.user_review.user.username }}</p>
                             <div class="actions">
-                                {% if review.user == request.user %}
-                                    <a href="{% url 'edit_review' review.id %}" class="button">Edit</a>
-                                    <form method="post" action="{% url 'delete_review' review.id %}" style="display: contents;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="delete-button">Delete</button>
-                                    </form>
-                                {% endif %}
+                                <a href="{% url 'edit_review' ticket.user_review.id %}" class="button">Edit Review</a>
+                                <form method="post" action="{% url 'delete_review' ticket.user_review.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button delete-button">Delete Review</button>
+                                </form>
                             </div>
                         </div>
+                    {% endif %}
+    
+                    <!-- Other reviews related to the ticket -->
+                    {% for review in ticket.ordered_reviews %}
+                        <!-- Only show reviews that are not the user's own review -->
+                        {% if review.user != request.user %}
+                            <div class="review">
+                                <h3>{{ review.headline }}</h3>
+                                <p>{{ review.body }}</p>
+                                <p><strong>Rating:</strong> {{ review.rating }}</p>
+                                <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endfor %}
         </div>
     </div>
+    
+    <style>
+        .button.disabled {
+            background-color: #ccc;
+            color: #666;
+            border: 1px solid #999;
+            cursor: not-allowed;
+        }
+    </style>
     
 </body>
 </html>

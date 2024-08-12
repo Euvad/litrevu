@@ -145,11 +145,78 @@
 
         <form method="post">
             {% csrf_token %}
-            {{ review_form.as_p }}
+            
+            <div class="form-group">
+                <!-- Render other form fields manually -->
+                {{ review_form.non_field_errors }}
+                {{ review_form.ticket.as_hidden }}
+                <div class="form-field">
+                    <label for="id_headline">Headline:</label>
+                    {{ review_form.headline }}
+                </div>
+                <div class="form-field">
+                    <label for="id_body">Body:</label>
+                    {{ review_form.body }}
+                </div>
+                
+                <!-- Custom star rating input -->
+                <div class="form-field">
+                    <label for="id_rating">Rating:</label>
+                    <div class="rating-input">
+                        <!-- Star rating radio buttons -->
+                        <input type="radio" id="star-5" name="rating" value="5" {% if review_form.rating.value == "5" %}checked{% endif %}>
+                        <label for="star-5" class="star">&#9733;</label>
+                        <input type="radio" id="star-4" name="rating" value="4" {% if review_form.rating.value == "4" %}checked{% endif %}>
+                        <label for="star-4" class="star">&#9733;</label>
+                        <input type="radio" id="star-3" name="rating" value="3" {% if review_form.rating.value == "3" %}checked{% endif %}>
+                        <label for="star-3" class="star">&#9733;</label>
+                        <input type="radio" id="star-2" name="rating" value="2" {% if review_form.rating.value == "2" %}checked{% endif %}>
+                        <label for="star-2" class="star">&#9733;</label>
+                        <input type="radio" id="star-1" name="rating" value="1" {% if review_form.rating.value == "1" %}checked{% endif %}>
+                        <label for="star-1" class="star">&#9733;</label>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit">Submit Review</button>
             <a href="{% url 'feed' %}" class="btn">Back to Feed</a>
         </form>
     </div>
+
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        .rating-input {
+            direction: rtl; /* Make the highest star appear first */
+            display: inline-flex;
+        }
+
+        .rating-input input[type="radio"] {
+            display: none; /* Hide the radio buttons */
+        }
+
+        .rating-input label {
+            font-size: 2em;
+            color: #ccc; /* Default star color */
+            cursor: pointer;
+        }
+
+        .rating-input input[type="radio"]:checked ~ label {
+            color: gold; /* Highlight selected star and all previous ones */
+        }
+
+        .rating-input label:hover,
+        .rating-input label:hover ~ label {
+            color: gold; /* Highlight stars on hover */
+        }
+    </style>
 </body>
+
 
 </html>
