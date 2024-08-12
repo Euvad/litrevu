@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from .models import Review
 from .forms import ReviewForm
 from tickets.models import Ticket
-# Create your views here.
+
 class CreateReviewView(LoginRequiredMixin, CreateView):
     model = Review
     form_class = ReviewForm
@@ -40,6 +40,12 @@ class DeleteReviewView(LoginRequiredMixin, DeleteView):
 class CreateReviewForTicketView(LoginRequiredMixin, View):
     def get(self, request, ticket_id, *args, **kwargs):
         ticket = get_object_or_404(Ticket, id=ticket_id)
+        
+        # Check if the user has already created a review for this ticket
+        if Review.objects.filter(ticket=ticket, user=request.user).exists():
+            messages.error(request, "You have already reviewed this ticket.")
+            return redirect('feed')
+
         review_form = ReviewForm()
         return render(request, 'reviews/create_review_for_ticket.html', {
             'ticket': ticket,
@@ -48,6 +54,12 @@ class CreateReviewForTicketView(LoginRequiredMixin, View):
 
     def post(self, request, ticket_id, *args, **kwargs):
         ticket = get_object_or_404(Ticket, id=ticket_id)
+        
+        # Check if the user has already created a review for this ticket
+        if Review.objects.filter(ticket=ticket, user=request.user).exists():
+            messages.error(request, "You have already reviewed this ticket.")
+            return redirect('feed')
+
         review_form = ReviewForm(request.POST)
         
         if review_form.is_valid():

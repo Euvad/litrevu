@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from tickets.models import Ticket
+from django.utils import timezone
 
 # Create your models here.
 class Review(models.Model):
@@ -10,3 +11,4 @@ class Review(models.Model):
     body = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)

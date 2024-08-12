@@ -3,7 +3,7 @@ from django.views.generic import ListView
 from tickets.models import Ticket
 from reviews.models import Review
 from social.models import UserFollows
-# Create your views here.
+
 class FeedView(LoginRequiredMixin, ListView):
     template_name = 'feed/feed.html'
     context_object_name = 'tickets'
@@ -11,14 +11,21 @@ class FeedView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Get IDs of users followed by the current user
         followed_users = UserFollows.objects.filter(user=self.request.user).values_list('followed_user', flat=True)
-        # Include tickets from followed users and the current user
-        return Ticket.objects.filter(user__in=followed_users).union(Ticket.objects.filter(user=self.request.user))
+        # Include tickets from followed users and the current user, ordered by creation date (oldest first)
+        tickets = Ticket.objects.filter(
+            user__in=list(followed_users) + [self.request.user]
+        ).order_by('created_at')  # Ascending order
+
+        # Annotate tickets with a flag indicating if the user has reviewed it
+        for ticket in tickets:
+            ticket.has_reviewed = Review.objects.filter(ticket=ticket, user=self.request.user).exists()
+
+        return tickets
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Include reviews for tickets from followed users and the current user
-        context['reviews'] = Review.objects.filter(
-            ticket__user__in=self.get_queryset().values_list('user', flat=True)
-        ).union(Review.objects.filter(ticket__user=self.request.user))
-        return context
+        
+        # Fetch the tickets that are being displayed
+        context['tickets'] = self.get_queryset()
 
+        return context
