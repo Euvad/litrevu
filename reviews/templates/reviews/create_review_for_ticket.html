@@ -141,7 +141,7 @@
 
 <body>
     <div class="container">
-        <h1>Create Review for Ticket: {{ ticket.title }}</h1>
+        <h1>Create Review for Book: {{ ticket.title }}</h1>
 
         <form method="post">
             {% csrf_token %}
@@ -151,11 +151,11 @@
                 {{ review_form.non_field_errors }}
                 {{ review_form.ticket.as_hidden }}
                 <div class="form-field">
-                    <label for="id_headline">Headline:</label>
+                    <label for="id_headline">Title:</label>
                     {{ review_form.headline }}
                 </div>
                 <div class="form-field">
-                    <label for="id_body">Body:</label>
+                    <label for="id_body">Comment:</label>
                     {{ review_form.body }}
                 </div>
                 

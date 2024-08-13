@@ -212,7 +212,7 @@
         }
     
         .feed-block img {
-            max-width: 50%; /* Make the image smaller */
+            max-width: 20%; /* Make the image smaller */
             height: auto;
             border-radius: 5px;
             margin-top: 10px;
@@ -250,9 +250,9 @@
     <div class="navbar">
         <h1>LitRevu</h1>
         <div class="nav-links">
-            <a href="{% url 'create_ticket' %}" class="button">Create Ticket</a>
-            <a href="{% url 'create_ticket_review' %}" class="button">Create Ticket and Review</a>
-            <a href="{% url 'list_followed_users' %}" class="button">Followed Users</a>
+            <a href="{% url 'create_ticket' %}" class="button">Create Book</a>
+            <a href="{% url 'create_ticket_review' %}" class="button">Create Book & Make Review</a>
+            <a href="{% url 'list_followed_users' %}" class="button">Followers</a>
             <form method="post" action="{% url 'logout' %}" style="display:flex; height: 47px;">
                 {% csrf_token %}
                 <button type="submit" class="button">Disconnect</button>
@@ -286,47 +286,39 @@
                         {% endif %}
                     </div>
     
-                    <!-- Display the user's review if it exists -->
-                    {% if ticket.user_review %}
+                    <!-- Loop through all reviews related to this ticket -->
+                    {% for review in ticket.review_set.all %}
                         <div class="review">
-                            <h3>{{ ticket.user_review.headline }}</h3>
-                            <p>{{ ticket.user_review.body }}</p>
+                            <h3>{{ review.headline }}</h3>
+                            <p>{{ review.body }}</p>
                             <p><strong>Rating:</strong>
                                 {% for i in "12345" %}
-                                    {% if forloop.counter <= ticket.user_review.rating %}
+                                    {% if forloop.counter <= review.rating %}
                                         <span class="star">&#9733;</span> <!-- Filled star -->
                                     {% else %}
                                         <span class="star empty">&#9734;</span> <!-- Empty star -->
                                     {% endif %}
                                 {% endfor %}
-                            </p>                            
-                            <p><strong>Reviewed by:</strong> {{ ticket.user_review.user.username }}</p>
-                            <div class="actions">
-                                <a href="{% url 'edit_review' ticket.user_review.id %}" class="button">Edit Review</a>
-                                <form method="post" action="{% url 'delete_review' ticket.user_review.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="button delete-button">Delete Review</button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endif %}
+                            </p>
+                            <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
     
-                    <!-- Other reviews related to the ticket -->
-                    {% for review in ticket.ordered_reviews %}
-                        <!-- Only show reviews that are not the user's own review -->
-                        {% if review.user != request.user %}
-                            <div class="review">
-                                <h3>{{ review.headline }}</h3>
-                                <p>{{ review.body }}</p>
-                                <p><strong>Rating:</strong> {{ review.rating }}</p>
-                                <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
-                            </div>
-                        {% endif %}
+                            <!-- Show edit/delete options if the review is by the logged-in user -->
+                            {% if review.user == request.user %}
+                                <div class="actions">
+                                    <a href="{% url 'edit_review' review.id %}" class="button">Edit Review</a>
+                                    <form method="post" action="{% url 'delete_review' review.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="button delete-button">Delete Review</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 </div>
             {% endfor %}
         </div>
     </div>
+    
     
     <style>
         .button.disabled {

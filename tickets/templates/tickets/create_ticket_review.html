@@ -167,7 +167,7 @@
 
 <body>
     <div class="container">
-        <h1>Create Ticket and Review</h1>
+        <h1>Create Book and Review it</h1>
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -178,18 +178,18 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
-            <h2>Create Ticket</h2>
+            <h2>Create Book</h2>
             {{ ticket_form.as_p }}
 
             <h2>Create Review</h2>
             <div class="form-group">
                 {{ review_form.non_field_errors }}
                 <div class="form-field">
-                    <label for="id_headline">Headline:</label>
+                    <label for="id_headline">Title:</label>
                     {{ review_form.headline }}
                 </div>
                 <div class="form-field">
-                    <label for="id_body">Body:</label>
+                    <label for="id_body">Comment:</label>
                     {{ review_form.body }}
                 </div>
                 
