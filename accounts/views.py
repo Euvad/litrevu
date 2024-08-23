@@ -3,12 +3,15 @@ from django.contrib.auth import login, logout
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required  # Make sure this line is present
+from django.contrib.auth.decorators import (
+    login_required,
+)  # Make sure this line is present
+
 
 class RegisterView(FormView):
-    template_name = 'registration/register.html'
+    template_name = "registration/register.html"
     form_class = UserCreationForm
-    success_url = reverse_lazy('feed')
+    success_url = reverse_lazy("feed")
 
     def form_valid(self, form):
         user = form.save()
@@ -23,10 +26,9 @@ class RegisterView(FormView):
         context = super().get_context_data(**kwargs)
         # Optionally add more context here
         return context
-    
+
 
 @login_required
 def custom_logout(request):
     logout(request)
-    return redirect('login')
-
+    return redirect("login")

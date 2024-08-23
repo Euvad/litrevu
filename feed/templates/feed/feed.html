@@ -187,6 +187,7 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             padding: 20px;
+            width: 800px;
             background-color: #ffffff;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
             transition: box-shadow 0.3s, transform 0.3s;
@@ -242,6 +243,7 @@
         .review p strong {
             color: #333;
         }
+        
     </style>
     
     
@@ -250,74 +252,105 @@
     <div class="navbar">
         <h1>LitRevu</h1>
         <div class="nav-links">
+            <a href="{% url 'feed' %}" class="button {% if not my_posts %}active{% endif %}">Feed</a> <!-- New button for all posts -->
             <a href="{% url 'create_ticket' %}" class="button">Create Book</a>
             <a href="{% url 'create_ticket_review' %}" class="button">Create Book & Make Review</a>
             <a href="{% url 'list_followed_users' %}" class="button">Followers</a>
+            <a href="?my_posts=true" class="button {% if my_posts %}active{% endif %}">My Posts</a>
             <form method="post" action="{% url 'logout' %}" style="display:flex; height: 47px;">
                 {% csrf_token %}
                 <button type="submit" class="button">Disconnect</button>
             </form>
         </div>
     </div>
-
+    
     <div class="container">
         <div class="main-content">
-            {% for ticket in tickets reversed %}
-                <div class="feed-block">
-                    <h2>{{ ticket.title }}</h2>
-                    <p>{{ ticket.description }}</p>
-                    {% if ticket.image %}
-                        <img src="{{ ticket.image.url }}" alt="{{ ticket.title }}">
-                    {% endif %}
-                    <p><strong>Posted by:</strong> {{ ticket.user.username }}</p>
-    
-                    <div class="actions">
-                        {% if not ticket.has_reviewed %}
-                            <a href="{% url 'create_review_for_ticket' ticket.id %}" class="button">Make Review</a>
-                        {% else %}
-                            <a href="#" class="button disabled" style="pointer-events: none; opacity: 0.5;">Make Review</a>
+            {% for item in feed_items %}
+                {% if item.get_type == 'ticket' %}
+                    <!-- Render the ticket -->
+                    <div class="feed-block">
+                        <h2>{{ item.title }}</h2>
+                        <p>{{ item.description }}</p>
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}">
                         {% endif %}
-                        {% if ticket.user == request.user %}
-                            <a href="{% url 'edit_ticket' ticket.id %}" class="button">Edit Ticket</a>
-                            <form method="post" action="{% url 'delete_ticket' ticket.id %}" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="button delete-button">Delete Ticket</button>
-                            </form>
-                        {% endif %}
-                    </div>
+                        <p><strong>Posted by:</strong> {{ item.user.username }}</p>
     
-                    <!-- Loop through all reviews related to this ticket -->
-                    {% for review in ticket.review_set.all %}
-                        <div class="review">
-                            <h3>{{ review.headline }}</h3>
-                            <p>{{ review.body }}</p>
-                            <p><strong>Rating:</strong>
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= review.rating %}
-                                        <span class="star">&#9733;</span> <!-- Filled star -->
-                                    {% else %}
-                                        <span class="star empty">&#9734;</span> <!-- Empty star -->
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
-                            <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
-    
-                            <!-- Show edit/delete options if the review is by the logged-in user -->
-                            {% if review.user == request.user %}
-                                <div class="actions">
-                                    <a href="{% url 'edit_review' review.id %}" class="button">Edit Review</a>
-                                    <form method="post" action="{% url 'delete_review' review.id %}" style="display: inline;">
-                                        {% csrf_token %}
-                                        <button type="submit" class="button delete-button">Delete Review</button>
-                                    </form>
-                                </div>
+                        <div class="actions">
+                            {% if not item.has_reviewed %}
+                                <a href="{% url 'create_review_for_ticket' item.id %}" class="button">Make Review</a>
+                            {% else %}
+                                <a href="#" class="button disabled" style="pointer-events: none; opacity: 0.5;">Make Review</a>
+                            {% endif %}
+                            {% if item.user == request.user %}
+                                <a href="{% url 'edit_ticket' item.id %}" class="button">Edit Ticket</a>
+                                <form method="post" action="{% url 'delete_ticket' item.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button delete-button">Delete Ticket</button>
+                                </form>
                             {% endif %}
                         </div>
-                    {% endfor %}
-                </div>
+    
+                        <!-- Loop through all reviews related to this ticket -->
+                        {% for review in item.review_set.all %}
+                            <div class="review">
+                                <h3>{{ review.headline }}</h3>
+                                <p>{{ review.body }}</p>
+                                <p><strong>Rating:</strong>
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="star">&#9733;</span> <!-- Filled star -->
+                                        {% else %}
+                                            <span class="star empty">&#9734;</span> <!-- Empty star -->
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p><strong>Reviewed by:</strong> {{ review.user.username }}</p>
+    
+                                <!-- Show edit/delete options if the review is by the logged-in user -->
+                                {% if review.user == request.user %}
+                                    <div class="actions">
+                                        <a href="{% url 'edit_review' review.id %}" class="button">Edit Review</a>
+                                        <form method="post" action="{% url 'delete_review' review.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button delete-button">Delete Review</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% elif item.get_type == 'review' %}
+                    <!-- Render the user's review on someone else's ticket -->
+                    <div class="feed-block">
+                        <h3>{{ item.headline }}</h3>
+                        <p>{{ item.body }}</p>
+                        <p><strong>Rating:</strong>
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= item.rating %}
+                                    <span class="star">&#9733;</span> <!-- Filled star -->
+                                {% else %}
+                                    <span class="star empty">&#9734;</span> <!-- Empty star -->
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        <p><strong>Reviewed on ticket:</strong> {{ item.ticket.title }}</p>
+                        <p><strong>Reviewed by:</strong> {{ item.user.username }}</p>
+    
+                        <div class="actions">
+                            <a href="{% url 'edit_review' item.id %}" class="button">Edit Review</a>
+                            <form method="post" action="{% url 'delete_review' item.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="button delete-button">Delete Review</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
+    
     
     
     <style>

@@ -1,7 +1,7 @@
 db.sqlite3
 /migrations
-
-
+venv
+.DS_Store
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
@@ -11,3 +11,4 @@ __pycache__/
 
 # Ignore all files in the /media directory
 /media/
+run.py
