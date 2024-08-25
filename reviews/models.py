@@ -10,8 +10,6 @@ class Review(models.Model):
     headline = models.CharField(max_length=128)
     body = models.TextField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    time_created = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(default=timezone.now)
-
     def get_type(self):
         return 'review'

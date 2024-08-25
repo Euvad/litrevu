@@ -252,7 +252,7 @@
     <div class="navbar">
         <h1>LitRevu</h1>
         <div class="nav-links">
-            <a href="{% url 'feed' %}" class="button {% if not my_posts %}active{% endif %}">Feed</a> <!-- New button for all posts -->
+            <a href="{% url 'feed' %}" class="button {% if not my_posts %}active{% endif %}">Feed</a> 
             <a href="{% url 'create_ticket' %}" class="button">Create Book</a>
             <a href="{% url 'create_ticket_review' %}" class="button">Create Book & Make Review</a>
             <a href="{% url 'list_followed_users' %}" class="button">Followers</a>
