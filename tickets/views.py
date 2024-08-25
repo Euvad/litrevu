@@ -54,7 +54,7 @@ class CreateTicketReviewView(LoginRequiredMixin, View):
         )
 
     def post(self, request, *args, **kwargs):
-        ticket_form = TicketForm(request.POST)
+        ticket_form = TicketForm(request.POST, request.FILES)
         review_form = ReviewForm(request.POST)
 
         if ticket_form.is_valid() and review_form.is_valid():
